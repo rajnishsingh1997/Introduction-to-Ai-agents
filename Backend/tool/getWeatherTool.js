@@ -23,6 +23,7 @@ const getWeatherDetails = async (cityName) => {
     return parsedJsonResponse;
   } catch (error) {
     console.log(error.message);
+    throw new Error(`Weather service failed: ${error.message}`);
   }
 };
 
