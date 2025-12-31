@@ -13,7 +13,7 @@ const getAqiDetails = async (cityName) => {
     );
     if (!response.ok) {
       throw new Error(
-        `Weather API request failed with status ${response.status}`
+        `AQI API request failed with status ${response.status}`
       );
     }
     const parsedJsonResponse = await response.json();
