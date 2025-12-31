@@ -1,12 +1,28 @@
 const getWeatherDetails = async (cityName) => {
   try {
-    const response =
-      await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.API_KEY}&q=${cityName}&aqi=yes
-`);
+    if (!process.env.API_KEY) {
+      throw new Error("Api keys for the weather details not found");
+    }
 
-    return response;
+    if (!cityName || typeof cityName !== "string") {
+      throw new Error("invalid city name provided for the api call");
+    }
+    const response = await fetch(
+      `http://api.weatherapi.com/v1/current.json?key=${
+        process.env.API_KEY
+      }&${encodeURIComponent(cityName)}&aqi=yes`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Weather API request failed with status ${response.status}`
+      );
+    }
+
+    const parsedJsonResponse = await response.json();
+    return parsedJsonResponse;
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 };
 
