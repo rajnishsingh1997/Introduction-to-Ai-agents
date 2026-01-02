@@ -7,7 +7,7 @@ const client = new OpenAI();
 
 const toolMap = {
   getWeatherDetails,
-  getAQIDetails,
+  getAqiDetails,
 };
 
 const weatherAgent = async (userMessage) => {
