@@ -10,28 +10,71 @@ const toolMap = {
   getAqiDetails,
 };
 
-const weatherAgent = async (userMessage) => {
-  const message = [
+const weatherAgent = async (userMessage, history) => {
+  console.log(history);
+  const messages = [
     {
       role: "system",
       content: systemPrompt,
     },
-  ];
-  if (userMessage) {
-    message.push({
+    ...history,
+    {
       role: "user",
       content: userMessage,
-    });
-  }
-  const completion = await client.chat.completions.create({
+    },
+  ];
+
+  const firstCompletion = await client.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: message,
+    messages,
   });
 
-  let LLMResponseContent = completion.choices[0].message.content;
+  const firstResponseContent = firstCompletion.choices[0].message.content;
+  console.log("firstResponseContent", firstResponseContent);
 
+  let parsedResponse;
+  try {
+    parsedResponse = JSON.parse(firstResponseContent);
+  } catch (error) {
+    return firstResponseContent;
+  }
 
-  return completion.choices[0].message;
+  if (parsedResponse.action === null) {
+    return parsedResponse.finalAnswer;
+  }
+
+  const toolName = parsedResponse.action.tool;
+  const toolInput = parsedResponse.action.input;
+
+  if (!toolMap[toolName]) {
+    throw new Error(`Tool "${toolName}" is not allowed`);
+  }
+
+  const observation = await toolMap[toolName](toolInput.city);
+
+  messages.push({
+    role: "assistant",
+    content: firstResponseContent,
+  });
+  messages.push({
+    role: "system",
+    content: `Observation:\n${JSON.stringify(observation)}`,
+  });
+
+  const finalCompletion = await client.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages,
+  });
+
+  const finalResponseContent = finalCompletion.choices[0].message.content;
+
+  let finalParsedResponse;
+  try {
+    finalParsedResponse = JSON.parse(finalResponseContent);
+  } catch (error) {
+    throw new Error("Final LLM response is not valid JSON");
+  }
+  return finalParsedResponse.finalAnswer;
 };
 
 export default weatherAgent;

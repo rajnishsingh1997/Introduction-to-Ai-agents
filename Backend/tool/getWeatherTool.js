@@ -13,7 +13,6 @@ const getWeatherDetails = async (cityName) => {
       }&q=${encodeURIComponent(cityName)}&aqi=yes`
     );
 
-
     if (!response.ok) {
       throw new Error(
         `Weather API request failed with status ${response.status}`
