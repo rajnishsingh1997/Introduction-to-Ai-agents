@@ -28,8 +28,10 @@ const weatherAgent = async (userMessage) => {
     messages: message,
   });
 
-  console.log(completion.choices);
-  console.log("running inside agent");
+  let LLMResponseContent = completion.choices[0].message.content;
+
+
+  return completion.choices[0].message;
 };
 
 export default weatherAgent;

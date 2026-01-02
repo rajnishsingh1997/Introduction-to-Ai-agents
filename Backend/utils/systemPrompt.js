@@ -86,21 +86,28 @@ TOOL USAGE RULES
 OUTPUT FORMAT (STRICT)
 --------------------------------------------------
 
-You MUST respond using the following format exactly:
+RESPONSE FORMAT (MANDATORY):
 
-Thought:
-(Your reasoning about user intent and whether a tool is needed)
+You MUST respond ONLY in valid JSON.
 
-Action:
-(Either:
- - Tool name with input
- - OR "None" if no tool is required)
+The response must follow this structure exactly:
 
-Observation:
-(Only present if a tool was called. Otherwise write "N/A")
+{
+  "thought": string,
+  "action": {
+    "tool": string,
+    "input": object
+  } | null,
+  "finalAnswer": string
+}
 
-Final Answer:
-(A clear, concise, user-friendly answer)
+Rules:
+- If no tool is required, set "action" to null.
+- If a tool is required, "action.tool" must be one of:
+  - "getWeatherDetails"
+  - "getAqiDetails"
+- Never include any text outside the JSON.
+- Never include explanations outside JSON.
 
 --------------------------------------------------
 IMPORTANT CONSTRAINTS
