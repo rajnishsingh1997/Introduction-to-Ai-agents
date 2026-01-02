@@ -29,7 +29,7 @@ const weatherAgent = async (userMessage, history) => {
       messages,
     });
     const firstResponseContent = firstCompletion.choices[0].message.content;
-    console.log("firstResponseContent", firstResponseContent);
+
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(firstResponseContent);
@@ -53,6 +53,7 @@ const weatherAgent = async (userMessage, history) => {
       throw new Error(`Tool "${toolName}" is not allowed`);
     }
     const observation = await toolMap[toolName](toolInput.city);
+    console.log("observation", observation);
     messages.push({
       role: "assistant",
       content: firstResponseContent,
