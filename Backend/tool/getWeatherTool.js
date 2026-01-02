@@ -10,8 +10,9 @@ const getWeatherDetails = async (cityName) => {
     const response = await fetch(
       `http://api.weatherapi.com/v1/current.json?key=${
         process.env.API_KEY
-      }&${encodeURIComponent(cityName)}&aqi=yes`
+      }&q=${encodeURIComponent(cityName)}&aqi=yes`
     );
+
 
     if (!response.ok) {
       throw new Error(
