@@ -37,7 +37,14 @@ const weatherAgent = async (userMessage, history) => {
       return firstResponseContent;
     }
     if (parsedResponse.action === null) {
+      if (!parsedResponse.finalAnswer) {
+        throw new Error("Final Answer is missing");
+      }
       return parsedResponse.finalAnswer;
+    }
+
+    if (!parsedResponse.action || typeof parsedResponse.action !== "object") {
+      throw new Error("Invalid action structure in LLM response");
     }
     const toolName = parsedResponse.action.tool;
     const toolInput = parsedResponse.action.input;
@@ -54,10 +61,15 @@ const weatherAgent = async (userMessage, history) => {
       role: "system",
       content: `Observation:\n${JSON.stringify(observation)}`,
     });
-    const finalCompletion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
-    });
+    let finalCompletion;
+    try {
+      finalCompletion = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
 
     const finalResponseContent = finalCompletion.choices[0].message.content;
 
